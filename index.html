@@ -1,0 +1,251 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>X-Mas Music Generator</title>
+
+  <meta name="description" content="Create your own Christmas music with an interactive keyboard, music sequencer and MP3 recorder.">
+  <meta name="theme-color" content="#071710">
+
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <link rel="stylesheet" href="css/style.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
+</head>
+
+<body>
+
+  <!-- SNOW EFFECT -->
+  <div id="snowContainer"></div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="star">✦ ❄ ✦ ❄ ✦</div>
+
+    <h1>X-MAS MUSIC GENERATOR</h1>
+
+    <div class="subtitle" data-i18n="subtitle">
+      CARGA TU LEAD, DIBUJA EN LA CUADRÍCULA O TOCA EN VIVO
+    </div>
+
+    <!-- LANGUAGE SELECTOR -->
+    <div class="language-selector">
+      <span>🌐</span>
+
+      <select id="languageSelect" aria-label="Select language">
+        <option value="es">🇪🇸 Español</option>
+        <option value="en">🇬🇧 English</option>
+        <option value="fr">🇫🇷 Français</option>
+        <option value="de">🇩🇪 Deutsch</option>
+        <option value="pt">🇵🇹 Português</option>
+        <option value="it">🇮🇹 Italiano</option>
+      </select>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- AUDIO UPLOAD -->
+    <section class="panel">
+
+      <h2 data-i18n="uploadTitle">
+        📁 CARGAR SAMPLE / LEAD DE AUDIO
+      </h2>
+
+      <label class="file-upload" id="dropZone">
+
+        📂 <span data-i18n="uploadInstructions">
+          Arrastra y suelta tu archivo aquí o haz clic para seleccionar (MP3 / WAV)
+        </span>
+
+        <input
+          type="file"
+          id="sampleInput"
+          accept="audio/*"
+          hidden
+        >
+
+      </label>
+
+      <div id="sampleName" class="sample-name" data-i18n="noFile">
+        Ningún archivo cargado (usando sintetizador predeterminado)
+      </div>
+
+    </section>
+
+
+    <!-- SEQUENCER -->
+    <section class="panel">
+
+      <h2 data-i18n="sequencerTitle">
+        🎛️ SECUENCIADOR TIPO CUADRÍCULA
+      </h2>
+
+      <div class="sequencer-container">
+        <div class="sequencer-grid" id="seqGrid"></div>
+      </div>
+
+      <div class="action-row">
+
+        <button class="primary" id="playSeqBtn" data-i18n="playSequence">
+          ▶ Reproducir Secuencia
+        </button>
+
+        <button class="secondary" id="stopSeqBtn" data-i18n="stopSequence">
+          ⏹ Detener Secuencia
+        </button>
+
+        <button class="secondary" id="clearSeqBtn" data-i18n="clear">
+          🗑 Limpiar
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- CHRISTMAS SONGS -->
+    <section class="panel">
+
+      <h2 data-i18n="songsTitle">
+        🎶 CANCIONES NAVIDEÑAS AUTOMÁTICAS
+      </h2>
+
+      <div class="action-row">
+
+        <button class="song-btn" onclick="playSong('jingle')" data-i18n="jingle">
+          🔔 Jingle Bells
+        </button>
+
+        <button class="song-btn" onclick="playSong('silent')" data-i18n="silentNight">
+          ⭐ Noche de Paz
+        </button>
+
+        <button class="secondary" id="stopSongBtn" data-i18n="stopMusic">
+          ⏹ Detener Música
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- LIVE KEYBOARD -->
+    <section class="panel">
+
+      <h2 data-i18n="keyboardTitle">
+        🎹 TECLADO EN VIVO
+      </h2>
+
+      <div class="keyboard" id="keyboard"></div>
+
+      <p class="keyboard-hint">
+        A S D F G H J K L · W E T Y U O P
+      </p>
+
+    </section>
+
+
+    <!-- SETTINGS -->
+    <section class="panel">
+
+      <h2 data-i18n="settingsTitle">
+        ✨ CONFIGURACIÓN
+      </h2>
+
+      <div class="controls">
+
+        <div class="control">
+          <label>
+            <span data-i18n="volume">Volumen</span>
+            <span id="volValue">70%</span>
+          </label>
+
+          <input id="volume" type="range" min="0" max="100" value="70">
+        </div>
+
+        <div class="control">
+          <label>
+            <span data-i18n="brightness">Brillo / Filtro</span>
+            <span id="brightValue">90%</span>
+          </label>
+
+          <input id="brightness" type="range" min="10" max="100" value="90">
+        </div>
+
+        <div class="control">
+          <label>
+            <span data-i18n="echo">Eco / Delay</span>
+            <span id="echoValue">30%</span>
+          </label>
+
+          <input id="echo" type="range" min="0" max="80" value="30">
+        </div>
+
+        <div class="control">
+          <label>
+            <span data-i18n="bpm">BPM</span>
+            <span id="bpmValue">130</span>
+          </label>
+
+          <input id="bpm" type="range" min="80" max="180" value="130">
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- VISUALIZER AND RECORDING -->
+    <section class="panel">
+
+      <h2 data-i18n="visualTitle">
+        🎛️ VISUALIZADOR Y 🔴 GRABACIÓN MP3
+      </h2>
+
+      <div class="visual" id="visual"></div>
+
+      <div class="action-row">
+
+        <button class="record" id="recordBtn" data-i18n="record">
+          ● GRABAR AUDIO
+        </button>
+
+        <button class="secondary" id="stopRecordBtn" disabled data-i18n="stop">
+          ■ DETENER
+        </button>
+
+        <button class="primary" id="downloadBtn" disabled data-i18n="download">
+          ⬇ DESCARGAR MP3
+        </button>
+
+        <button class="cafe" onclick="window.open('https://ko-fi.com/deviolabs', '_blank', 'noopener,noreferrer')" data-i18n="cafe">
+          ☕ INVÍTAME UN CAFÉ
+        </button>
+
+      </div>
+
+      <div id="status" data-i18n="ready">
+        Listo para componer tu melodía navideña.
+      </div>
+
+    </section>
+
+  </main>
+
+<!-- FOOTER -->
+<footer data-i18n="footer">
+  MADE BY DEVIOLABS
+</footer>
+
+
+
+  <!-- JAVASCRIPT -->
+  <script src="js/translations.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
